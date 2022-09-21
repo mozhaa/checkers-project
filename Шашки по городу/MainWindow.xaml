@@ -27,5 +27,77 @@
             <ColumnDefinition Width="70"/>
             <ColumnDefinition Width="70"/>
         </Grid.ColumnDefinitions>
+        <Rectangle Grid.Row="0"  Grid.Column="0" Fill="White"/>
+        <Rectangle Grid.Row="0"  Grid.Column="1" Fill="Black"/>
+        <Rectangle Grid.Row="0"  Grid.Column="2" Fill="White"/>
+        <Rectangle Grid.Row="0"  Grid.Column="3" Fill="Black"/>
+        <Rectangle Grid.Row="0"  Grid.Column="4" Fill="White"/>
+        <Rectangle Grid.Row="0"  Grid.Column="5" Fill="Black"/>
+        <Rectangle Grid.Row="0"  Grid.Column="6" Fill="White"/>
+        <Rectangle Grid.Row="0"  Grid.Column="7" Fill="Black"/>
+
+        <Rectangle Grid.Row="1"  Grid.Column="0" Fill="Black"/>
+        <Rectangle Grid.Row="1"  Grid.Column="1" Fill="White"/>
+        <Rectangle Grid.Row="1"  Grid.Column="2" Fill="Black"/>
+        <Rectangle Grid.Row="1"  Grid.Column="3" Fill="White"/>
+        <Rectangle Grid.Row="1"  Grid.Column="4" Fill="Black"/>
+        <Rectangle Grid.Row="1"  Grid.Column="5" Fill="White"/>
+        <Rectangle Grid.Row="1"  Grid.Column="6" Fill="Black"/>
+        <Rectangle Grid.Row="1"  Grid.Column="7" Fill="White"/>
+
+        <Rectangle Grid.Row="2"  Grid.Column="0" Fill="White"/>
+        <Rectangle Grid.Row="2"  Grid.Column="1" Fill="Black"/>
+        <Rectangle Grid.Row="2"  Grid.Column="2" Fill="White"/>
+        <Rectangle Grid.Row="2"  Grid.Column="3" Fill="Black"/>
+        <Rectangle Grid.Row="2"  Grid.Column="4" Fill="White"/>
+        <Rectangle Grid.Row="2"  Grid.Column="5" Fill="Black"/>
+        <Rectangle Grid.Row="2"  Grid.Column="6" Fill="White"/>
+        <Rectangle Grid.Row="2"  Grid.Column="7" Fill="Black"/>
+
+        <Rectangle Grid.Row="3"  Grid.Column="0" Fill="Black"/>
+        <Rectangle Grid.Row="3"  Grid.Column="1" Fill="White"/>
+        <Rectangle Grid.Row="3"  Grid.Column="2" Fill="Black"/>
+        <Rectangle Grid.Row="3"  Grid.Column="3" Fill="White"/>
+        <Rectangle Grid.Row="3"  Grid.Column="4" Fill="Black"/>
+        <Rectangle Grid.Row="3"  Grid.Column="5" Fill="White"/>
+        <Rectangle Grid.Row="3"  Grid.Column="6" Fill="Black"/>
+        <Rectangle Grid.Row="3"  Grid.Column="7" Fill="White"/>
+
+        <Rectangle Grid.Row="4"  Grid.Column="0" Fill="White"/>
+        <Rectangle Grid.Row="4"  Grid.Column="1" Fill="Black"/>
+        <Rectangle Grid.Row="4"  Grid.Column="2" Fill="White"/>
+        <Rectangle Grid.Row="4"  Grid.Column="3" Fill="Black"/>
+        <Rectangle Grid.Row="4"  Grid.Column="4" Fill="White"/>
+        <Rectangle Grid.Row="4"  Grid.Column="5" Fill="Black"/>
+        <Rectangle Grid.Row="4"  Grid.Column="6" Fill="White"/>
+        <Rectangle Grid.Row="4"  Grid.Column="7" Fill="Black"/>
+
+        <Rectangle Grid.Row="5"  Grid.Column="0" Fill="Black"/>
+        <Rectangle Grid.Row="5"  Grid.Column="1" Fill="White"/>
+        <Rectangle Grid.Row="5"  Grid.Column="2" Fill="Black"/>
+        <Rectangle Grid.Row="5"  Grid.Column="3" Fill="White"/>
+        <Rectangle Grid.Row="5"  Grid.Column="4" Fill="Black"/>
+        <Rectangle Grid.Row="5"  Grid.Column="5" Fill="White"/>
+        <Rectangle Grid.Row="5"  Grid.Column="6" Fill="Black"/>
+        <Rectangle Grid.Row="5"  Grid.Column="7" Fill="White"/>
+
+        <Rectangle Grid.Row="6"  Grid.Column="0" Fill="White"/>
+        <Rectangle Grid.Row="6"  Grid.Column="1" Fill="Black"/>
+        <Rectangle Grid.Row="6"  Grid.Column="2" Fill="White"/>
+        <Rectangle Grid.Row="6"  Grid.Column="3" Fill="Black"/>
+        <Rectangle Grid.Row="6"  Grid.Column="4" Fill="White"/>
+        <Rectangle Grid.Row="6"  Grid.Column="5" Fill="Black"/>
+        <Rectangle Grid.Row="6"  Grid.Column="6" Fill="White"/>
+        <Rectangle Grid.Row="6"  Grid.Column="7" Fill="Black"/>
+
+        <Rectangle Grid.Row="7"  Grid.Column="0" Fill="Black"/>
+        <Rectangle Grid.Row="7"  Grid.Column="1" Fill="White"/>
+        <Rectangle Grid.Row="7"  Grid.Column="2" Fill="Black"/>
+        <Rectangle Grid.Row="7"  Grid.Column="3" Fill="White"/>
+        <Rectangle Grid.Row="7"  Grid.Column="4" Fill="Black"/>
+        <Rectangle Grid.Row="7"  Grid.Column="5" Fill="White"/>
+        <Rectangle Grid.Row="7"  Grid.Column="6" Fill="Black"/>
+        <Rectangle Grid.Row="7"  Grid.Column="7" Fill="White"/>
+
     </Grid>
 </Window>
