@@ -14,12 +14,6 @@ namespace Шашки_по_городу
         white,
         black
     }
-    //internal class Checker
-    //{
-    //    public int row { get; set; }
-    //    public int column { get; set; }
-    //    public Player player { get; set; } 
-    //}
     internal class Presenter
     {
 
@@ -73,18 +67,34 @@ namespace Шашки_по_городу
         {
             if(selectedChecker != null)
             {
-                if (TryToMove(selectedChecker, row, column))
+                if (selectedChecker.Item1 == row && selectedChecker.Item2 == column)
                 {
+                    view.DehighlightTile(selectedChecker.Item1, selectedChecker.Item2);
                     selectedChecker = null;
-                    currentPlayer = (currentPlayer == Player.white) ? Player.black : Player.white;
-                    Trace.WriteLine($"Current Player: {currentPlayer}");
+                    Trace.WriteLine($"Deselect tile, you can select new one");
+                }
+                else
+                {
+                    if (TryToMove(selectedChecker, row, column))
+                    {
+                        view.DehighlightTile(selectedChecker.Item1, selectedChecker.Item2);
+                        selectedChecker = null;
+                        currentPlayer = (currentPlayer == Player.white) ? Player.black : Player.white;
+                        Trace.WriteLine($"Current Player: {currentPlayer}");
+                    }
                 }
             }
             else
             {
                 if(board[row, column].HasValue && board[row, column].Value == currentPlayer)
                 {
+                    Trace.WriteLine("Selected new checker to move");
+                    view.HighlightTile(row, column);
                     selectedChecker = new Tuple<int, int>(row, column);
+                }
+                else
+                {
+                    Trace.WriteLine("Selected tile is empty or wrong color");
                 }
             }
         }
@@ -93,14 +103,17 @@ namespace Шашки_по_городу
         {
             if (board[row, column] != null)
             {
+                Trace.WriteLine("Tile to move is not empty, can't move checker into it");
                 return false;
             }
             if (row < 0 || row > 7 || column < 0 || column > 7)
             {
+                Trace.WriteLine("Wrong row or column, out of board");
                 return false;
             }
             if(TrySimpleMove(selectedChecker, row, column, currentPlayer))
             {
+                Trace.WriteLine("Simple move is valid, make move");
                 return true;
             }
             return false;
@@ -116,6 +129,7 @@ namespace Шашки_по_городу
                 board[selectedChecker.Item1, selectedChecker.Item2] = null;
                 return true;
             }
+            Trace.WriteLine("Simple move is not valid, try another tile to move");
             return false;
         }
 

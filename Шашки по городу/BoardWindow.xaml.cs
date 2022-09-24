@@ -26,6 +26,7 @@ namespace Шашки_по_городу
 
         const string whiteColor = "#FFCE9E";
         const string blackColor = "#D18B47";
+        const string highlightColor = "#FF0000";
         const string checkerWhiteColor = "#FFFFFF";
         const string checkerBlackColor = "#000000";
         const int gridWidth = 560;
@@ -37,8 +38,10 @@ namespace Шашки_по_городу
         SolidColorBrush blackBrush = (SolidColorBrush)new BrushConverter().ConvertFromString(blackColor);
         SolidColorBrush checkerWhiteBrush = (SolidColorBrush)new BrushConverter().ConvertFromString(checkerWhiteColor);
         SolidColorBrush checkerBlackBrush = (SolidColorBrush)new BrushConverter().ConvertFromString(checkerBlackColor);
+        SolidColorBrush highlightBrush = (SolidColorBrush)new BrushConverter().ConvertFromString(highlightColor);
 
         System.Windows.Controls.Grid boardGrid = new System.Windows.Controls.Grid();
+        Rectangle[,] boardTiles = new Rectangle[Presenter.rows, Presenter.columns];
 
         List<Ellipse> checkersList = new List<Ellipse>();
 
@@ -72,7 +75,6 @@ namespace Шашки_по_городу
                 boardGrid.RowDefinitions.Add(rowdef);
             }
 
-            Rectangle[,] boardTiles = new Rectangle[Presenter.rows, Presenter.columns];
             for (int i = 0; i < Presenter.rows; i++)
             {
                 for (int j = 0; j < Presenter.columns; j++)
@@ -162,6 +164,20 @@ namespace Шашки_по_городу
             SetCoordinates(toRow, toColumn, checker);
         }
 
+        public void HighlightTile(int row, int column)
+        {
+            var rectangle = boardTiles[row, column];
+            rectangle.Stroke = highlightBrush;
+            rectangle.StrokeThickness = 3;
+        }
+
+        public void DehighlightTile(int row, int column)
+        {
+            var rectangle = boardTiles[row, column];
+            rectangle.Stroke = Brushes.Transparent;
+            rectangle.StrokeThickness = 0;
+        }
+
         private void Grid_MouseDown(object sender, MouseButtonEventArgs e)
         {
             Point clickedOn = e.GetPosition(boardGrid);
@@ -171,23 +187,6 @@ namespace Шашки_по_городу
             int column = (int)x / tileHeight;
             Trace.WriteLine($"clicked on ({row}, {column})");
             presenter.MouseDown(row, column);
-            //if (clickedOnCheckerToMove == null)
-            //{
-            //    Ellipse clickedOnChecker = GetCheckerByRowAndColumn(row, column);
-            //    if (clickedOnChecker != null)
-            //    {
-            //        clickedOnCheckerToMove = clickedOnChecker;
-            //    }
-
-            //}
-            //else
-            //{
-            //    if (GetCheckerByRowAndColumn(row, column) == null)
-            //    {
-            //        MoveChecker(clickedOnCheckerToMove, row, column);
-            //        clickedOnCheckerToMove = null;
-            //    }
-            //}
         }
 
     }
