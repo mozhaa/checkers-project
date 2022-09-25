@@ -7,6 +7,7 @@ namespace Шашки_по_городу
     {
         void AddCheckerToGrid(int row, int column, Player player);
         void DehighlightTile(int row, int column);
+        void HighlightChainedTile(int row, int column);
         void HighlightTile(int row, int column);
         void MoveChecker(int fromRow, int fromColumn, int toRow, int toColumn);
         void RemoveCheckerFromGrid(int row, int column);

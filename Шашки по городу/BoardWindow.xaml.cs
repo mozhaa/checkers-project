@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -27,6 +28,7 @@ namespace Шашки_по_городу
         const string whiteColor = "#FFCE9E";
         const string blackColor = "#D18B47";
         const string highlightColor = "#FF0000";
+        const string highlightChainedColor = "#007FFF";
         const string checkerWhiteColor = "#FFFFFF";
         const string checkerBlackColor = "#000000";
         const int gridWidth = 560;
@@ -39,6 +41,7 @@ namespace Шашки_по_городу
         SolidColorBrush checkerWhiteBrush = (SolidColorBrush)new BrushConverter().ConvertFromString(checkerWhiteColor);
         SolidColorBrush checkerBlackBrush = (SolidColorBrush)new BrushConverter().ConvertFromString(checkerBlackColor);
         SolidColorBrush highlightBrush = (SolidColorBrush)new BrushConverter().ConvertFromString(highlightColor);
+        SolidColorBrush highlightChainedBrush = (SolidColorBrush)new BrushConverter().ConvertFromString(highlightChainedColor);
 
         System.Windows.Controls.Grid boardGrid = new System.Windows.Controls.Grid();
         Rectangle[,] boardTiles = new Rectangle[Presenter.rows, Presenter.columns];
@@ -86,6 +89,11 @@ namespace Шашки_по_городу
                     Grid.SetColumn(tile, j);
 
                     boardGrid.Children.Add(tile);
+                    var tileNum = new TextBlock();
+                    tileNum.Text = $"{i}, {j}";
+                    Grid.SetRow(tileNum, i);
+                    Grid.SetColumn(tileNum, j);
+                    boardGrid.Children.Add(tileNum);
                 }
             }
             Content = boardGrid;
@@ -169,6 +177,13 @@ namespace Шашки_по_городу
             var rectangle = boardTiles[row, column];
             rectangle.Stroke = highlightBrush;
             rectangle.StrokeThickness = 3;
+        }
+
+        public void HighlightChainedTile(int row, int column)
+        {
+            var rectangle = boardTiles[row, column];
+            rectangle.Stroke = highlightChainedBrush;
+            rectangle.StrokeThickness = 2;
         }
 
         public void DehighlightTile(int row, int column)

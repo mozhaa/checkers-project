@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Xml.Linq;
 
 namespace Шашки_по_городу
@@ -21,7 +23,7 @@ namespace Шашки_по_городу
         public const int columns = 8;
         private readonly Player?[,] board = new Player?[rows, columns];
         private readonly IBoardView view;
-        private Tuple<int, int> selectedChecker;
+        private List<Tuple<int, int>> chainMove = new List<Tuple<int, int>>();
         private Player currentPlayer;
 
         public Presenter(IBoardView view)
@@ -65,22 +67,36 @@ namespace Шашки_по_городу
 
         internal void MouseDown(int row, int column)
         {
-            if(selectedChecker != null)
+            if(chainMove.Count > 0)
             {
+                var selectedChecker = chainMove[0];
                 if (selectedChecker.Item1 == row && selectedChecker.Item2 == column)
                 {
-                    view.DehighlightTile(selectedChecker.Item1, selectedChecker.Item2);
-                    selectedChecker = null;
+                    for (int i = 0; i < chainMove.Count; i++)
+                    {
+                        view.DehighlightTile(chainMove[i].Item1, chainMove[i].Item2);
+                    }
+                    chainMove.Clear();
                     Trace.WriteLine($"Deselect tile, you can select new one");
                 }
                 else
                 {
-                    if (TryToMove(selectedChecker, row, column))
+                    if (TryToMove(row, column) == 0)
                     {
-                        view.DehighlightTile(selectedChecker.Item1, selectedChecker.Item2);
-                        selectedChecker = null;
+                        for(int i = 0; i < chainMove.Count; i++)
+                        {
+                            view.DehighlightTile(chainMove[i].Item1, chainMove[i].Item2);
+                        }
+                        chainMove.Clear();
                         currentPlayer = (currentPlayer == Player.white) ? Player.black : Player.white;
                         Trace.WriteLine($"Current Player: {currentPlayer}");
+                    }
+                    else
+                    if (TryToMove(row, column) == 2)
+                    {
+                        chainMove.Add(new Tuple<int, int>(row, column));
+                        view.HighlightChainedTile(row, column);
+                        Trace.WriteLine("Chained new tile into chain move");
                     }
                 }
             }
@@ -90,7 +106,7 @@ namespace Шашки_по_городу
                 {
                     Trace.WriteLine("Selected new checker to move");
                     view.HighlightTile(row, column);
-                    selectedChecker = new Tuple<int, int>(row, column);
+                    chainMove.Add(new Tuple<int, int>(row, column));
                 }
                 else
                 {
@@ -99,33 +115,146 @@ namespace Шашки_по_городу
             }
         }
 
-        private bool TryToMove(Tuple<int, int> selectedChecker, int row, int column)
+        private HashSet<Tuple<int, int>> GetCheckersToEat(List<Tuple<int, int>> expectedChain)
+        {
+            var row = expectedChain[expectedChain.Count - 1].Item1;
+            var column = expectedChain[expectedChain.Count - 1].Item2;
+            if (row < 0 || row > 7 || column < 0 || column > 7)
+            {
+                return null;
+            }
+            if (board[row, column].HasValue)
+            {
+                return null;
+            }
+
+            var checkersToEat = new HashSet<Tuple<int, int>>();
+            for (int i = 1; i < expectedChain.Count; i++)
+            {
+                if (Math.Abs(expectedChain[i - 1].Item1 - expectedChain[i].Item1) == 2 &&
+                    Math.Abs(expectedChain[i - 1].Item2 - expectedChain[i].Item2) == 2)
+                {
+                    var tileToEat = new Tuple<int, int>((expectedChain[i - 1].Item1 + expectedChain[i].Item1) / 2,
+                                                        (expectedChain[i - 1].Item2 + expectedChain[i].Item2) / 2);
+
+                    if (board[tileToEat.Item1, tileToEat.Item2].HasValue &&
+                        board[tileToEat.Item1, tileToEat.Item2].Value == ((currentPlayer == Player.black) ? Player.white : Player.black))
+                    {
+                        if (!checkersToEat.Contains(tileToEat))
+                        {
+                            checkersToEat.Add(tileToEat);
+                            continue;
+                        }
+                        else
+                        {
+                            Trace.WriteLine($"[({row}, {column})]: You trying to eat one checker two times");
+                        }
+                    }
+                    else
+                    {
+                        Trace.WriteLine($"[({row}, {column})]: You trying to jump over empty tile or your checker");
+                    }
+                }
+                else
+                {
+                    Trace.WriteLine($"[({row}, {column})]: You trying to jump more than 2 tiles diagonally");
+                }
+                return null; // Invalid move
+            }
+
+            return checkersToEat; // Valid move
+        }
+
+        private int TryToChainMove(List<Tuple<int, int>> expectedChain)
+        {
+            var row = expectedChain[expectedChain.Count - 1].Item1;
+            var column = expectedChain[expectedChain.Count - 1].Item2;
+
+            var checkersToEat = GetCheckersToEat(expectedChain);
+            if(checkersToEat == null)
+            {
+                return 1; // Invalid move
+            }
+
+            var possibleMoves = new List<Tuple<int, int>> {
+                new Tuple<int, int>(row - 2, column - 2),
+                new Tuple<int, int>(row - 2, column + 2),
+                new Tuple<int, int>(row + 2, column - 2),
+                new Tuple<int, int>(row + 2, column + 2)
+            };
+            foreach (var moveToAdd in possibleMoves)
+            {
+                var possibleExpectedChain = new List<Tuple<int, int>>(expectedChain);
+                possibleExpectedChain.Add(moveToAdd);
+                if(GetCheckersToEat(possibleExpectedChain) != null)
+                {
+                    return 2; // Move is not complete
+                }
+            } 
+
+            foreach(var checkerToEat in checkersToEat)
+            {
+                Trace.WriteLine($"Eated checker on ({checkerToEat.Item1}, {checkerToEat.Item2})");
+                view.RemoveCheckerFromGrid(checkerToEat.Item1, checkerToEat.Item2);
+                board[checkerToEat.Item1, checkerToEat.Item2] = null;
+            }
+            var tileFromMove = chainMove[0];
+            var tileToMove = new Tuple<int, int>(row, column);
+            Trace.WriteLine("Move contains of:");
+            foreach(var chainmovetile in chainMove)
+            {
+                Trace.WriteLine($"({chainmovetile.Item1}, {chainmovetile.Item2})");
+            }
+            Trace.WriteLine($"Moving checker from ({tileFromMove.Item1}, {tileFromMove.Item2}) to ({tileToMove.Item1}, {tileToMove.Item2})");
+            view.MoveChecker(tileFromMove.Item1, tileFromMove.Item2, tileToMove.Item1, tileToMove.Item2);
+            board[tileFromMove.Item1, tileFromMove.Item2] = null;
+            board[tileToMove.Item1, tileToMove.Item2] = currentPlayer;
+            return 0; // Complete move
+
+        }
+
+        private int TryToMove(int row, int column)
         {
             if (board[row, column] != null)
             {
                 Trace.WriteLine("Tile to move is not empty, can't move checker into it");
-                return false;
+                return 1; // Invalid move
             }
             if (row < 0 || row > 7 || column < 0 || column > 7)
             {
                 Trace.WriteLine("Wrong row or column, out of board");
-                return false;
+                return 1; // Invalid move
             }
-            if(TrySimpleMove(selectedChecker, row, column, currentPlayer))
+            if(TrySimpleMove(row, column))
             {
                 Trace.WriteLine("Simple move is valid, make move");
-                return true;
+                return 0; // Valid move
             }
-            return false;
+            if(TryToChainMove(new List<Tuple<int, int>>(chainMove) { new Tuple<int, int>(row, column) }) == 0)
+            {
+                Trace.WriteLine("Chain move is complete, make move");
+                return 0; // Valid move
+            }
+            if(TryToChainMove(new List<Tuple<int, int>>(chainMove) { new Tuple<int, int>(row, column) }) == 2)
+            {
+                Trace.WriteLine("Chain move is not complete, selected new tile");
+                return 2; // Incomplete chain move
+            }
+            return 1;
         }
 
-        private bool TrySimpleMove(Tuple<int, int> selectedChecker, int row, int column, Player player)
+        private bool TrySimpleMove(int row, int column)
         {
+            var selectedChecker = chainMove[0];
+            if(chainMove.Count > 1)
+            {
+                return false;
+            }
             var validRow = (currentPlayer == Player.white) ? selectedChecker.Item1 + 1 : selectedChecker.Item1 - 1;
             if (row == validRow && (column == selectedChecker.Item2 - 1 || column == selectedChecker.Item2 + 1))
             {
                 view.MoveChecker(selectedChecker.Item1, selectedChecker.Item2, row, column);
-                board[row, column] = player;
+                board[row, column] = currentPlayer;
                 board[selectedChecker.Item1, selectedChecker.Item2] = null;
                 return true;
             }
