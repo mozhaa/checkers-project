@@ -70,7 +70,10 @@ namespace Шашки_по_городу
             if(chainMove.Count > 0)
             {
                 var selectedChecker = chainMove[0];
-                if (selectedChecker.Item1 == row && selectedChecker.Item2 == column)
+                var possibleExpectedChain = new List<Tuple<int, int>>(chainMove);
+                possibleExpectedChain.Add(new Tuple<int, int>(row, column));
+
+                if (selectedChecker.Item1 == row && selectedChecker.Item2 == column && GetCheckersToEat(possibleExpectedChain) == null)
                 {
                     for (int i = 0; i < chainMove.Count; i++)
                     {
@@ -123,7 +126,7 @@ namespace Шашки_по_городу
             {
                 return null;
             }
-            if (board[row, column].HasValue)
+            if (board[row, column].HasValue && (row != expectedChain[0].Item1 || column != expectedChain[0].Item2))
             {
                 return null;
             }
@@ -215,7 +218,7 @@ namespace Шашки_по_городу
 
         private int TryToMove(int row, int column)
         {
-            if (board[row, column] != null)
+            if (board[row, column] != null && (row != chainMove[0].Item1 || column != chainMove[0].Item2))
             {
                 Trace.WriteLine("Tile to move is not empty, can't move checker into it");
                 return 1; // Invalid move

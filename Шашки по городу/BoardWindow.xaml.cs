@@ -43,7 +43,7 @@ namespace Шашки_по_городу
         SolidColorBrush highlightBrush = (SolidColorBrush)new BrushConverter().ConvertFromString(highlightColor);
         SolidColorBrush highlightChainedBrush = (SolidColorBrush)new BrushConverter().ConvertFromString(highlightChainedColor);
 
-        System.Windows.Controls.Grid boardGrid = new System.Windows.Controls.Grid();
+        Grid boardGrid = new Grid();
         Rectangle[,] boardTiles = new Rectangle[Presenter.rows, Presenter.columns];
 
         List<Ellipse> checkersList = new List<Ellipse>();
@@ -52,7 +52,7 @@ namespace Шашки_по_городу
         {
             InitializeComponent();
             Title = "Шашки";
-            this.Loaded += BoardWindow_Loaded;
+            Loaded += BoardWindow_Loaded;
 
             boardGrid.Width = gridWidth;
             boardGrid.Height = gridHeight;
@@ -87,13 +87,16 @@ namespace Шашки_по_городу
                     tile.Fill = ((i + j) % 2 == 0) ? whiteBrush : blackBrush;
                     Grid.SetRow(tile, i);
                     Grid.SetColumn(tile, j);
-
                     boardGrid.Children.Add(tile);
+
+                    /*
+                     * coordinates on tiles
                     var tileNum = new TextBlock();
                     tileNum.Text = $"{i}, {j}";
                     Grid.SetRow(tileNum, i);
                     Grid.SetColumn(tileNum, j);
                     boardGrid.Children.Add(tileNum);
+                    */
                 }
             }
             Content = boardGrid;
