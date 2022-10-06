@@ -16,12 +16,33 @@ namespace Шашки_по_городу
         white,
         black
     }
+    public struct Checker
+    {
+
+        public Checker(Player player, bool isKing) : this()
+        {
+            this.player = player;
+            this.isKing = isKing;
+        }
+        public static Checker Black()
+        {
+            return new Checker(Player.black, false);
+        }
+        public static Checker White()
+        {
+            return new Checker(Player.white, false);
+        }
+
+
+        public Player player { get; set; }
+        public bool isKing { get; set; }
+    }
     internal class Presenter
     {
 
         public const int rows = 8;
         public const int columns = 8;
-        private readonly Player?[,] board = new Player?[rows, columns];
+        private readonly Checker?[,] board = new Checker?[rows, columns];
         private readonly IBoardView view;
         private List<Tuple<int, int>> chainMove = new List<Tuple<int, int>>();
         private Player currentPlayer;
@@ -53,7 +74,7 @@ namespace Шашки_по_городу
                         case 2:
                             if ((row + column) % 2 != 0)
                             {
-                                board[row, column] = Player.white;
+                                board[row, column] = Checker.White();
                                 checkersCount[Player.white]++;
                             }
                             break;
@@ -62,7 +83,7 @@ namespace Шашки_по_городу
                         case 7:
                             if ((row + column) % 2 != 0)
                             {
-                                board[row, column] = Player.black;
+                                board[row, column] = Checker.Black();
                                 checkersCount[Player.black]++;
                             }
                             break;
@@ -95,29 +116,38 @@ namespace Шашки_по_городу
                 }
                 else
                 {
-                    if (TryToMove(row, column) == 0)
+                    if (board[selectedChecker.Item1, selectedChecker.Item2].Value.isKing)
                     {
-                        for(int i = 0; i < chainMove.Count; i++)
-                        {
-                            view.DehighlightTile(chainMove[i].Item1, chainMove[i].Item2);
-                        }
-                        Trace.WriteLine($"chainmovecount: {chainMove.Count}");
-                        chainMove.Clear();
-                        currentPlayer = (currentPlayer == Player.white) ? Player.black : Player.white;
-                        Trace.WriteLine($"Current Player: {currentPlayer}");
+                        // Выбранная шашка - дамка
+                        
                     }
                     else
-                    if (TryToMove(row, column) == 2)
                     {
-                        chainMove.Add(new Tuple<int, int>(row, column));
-                        view.HighlightChainedTile(row, column);
-                        Trace.WriteLine("Chained new tile into chain move");
+                        // Выбранная шашка не дамка
+                        var moveResult = TryToMove(row, column);
+                        if (moveResult == 0)
+                        {
+                            for (int i = 0; i < chainMove.Count; i++)
+                            {
+                                view.DehighlightTile(chainMove[i].Item1, chainMove[i].Item2);
+                            }
+                            chainMove.Clear();
+                            currentPlayer = (currentPlayer == Player.white) ? Player.black : Player.white;
+                            Trace.WriteLine($"Current Player: {currentPlayer}");
+                        }
+                        else
+                        if (moveResult == 2)
+                        {
+                            chainMove.Add(new Tuple<int, int>(row, column));
+                            view.HighlightChainedTile(row, column);
+                            Trace.WriteLine("Chained new tile into chain move");
+                        }
                     }
                 }
             }
             else
             {
-                if(board[row, column].HasValue && board[row, column].Value == currentPlayer)
+                if(board[row, column].HasValue && board[row, column].Value.player == currentPlayer)
                 {
                     Trace.WriteLine("Selected new checker to move");
                     view.HighlightTile(row, column);
@@ -157,7 +187,7 @@ namespace Шашки_по_городу
                                                         (expectedChain[i - 1].Item2 + expectedChain[i].Item2) / 2);
 
                     if (board[tileToEat.Item1, tileToEat.Item2].HasValue &&
-                        board[tileToEat.Item1, tileToEat.Item2].Value == ((currentPlayer == Player.black) ? Player.white : Player.black))
+                        board[tileToEat.Item1, tileToEat.Item2].Value.player == ((currentPlayer == Player.black) ? Player.white : Player.black))
                     {
                         if (!checkersToEat.Contains(tileToEat))
                         {
@@ -227,7 +257,7 @@ namespace Шашки_по_городу
             Trace.WriteLine($"Moving checker from ({tileFromMove.Item1}, {tileFromMove.Item2}) to ({tileToMove.Item1}, {tileToMove.Item2})");
             view.MoveChecker(tileFromMove.Item1, tileFromMove.Item2, tileToMove.Item1, tileToMove.Item2);
             board[tileFromMove.Item1, tileFromMove.Item2] = null;
-            board[tileToMove.Item1, tileToMove.Item2] = currentPlayer;
+            board[tileToMove.Item1, tileToMove.Item2] = new Checker(currentPlayer, false);
             return 0; // Complete move
 
         }
@@ -275,7 +305,7 @@ namespace Шашки_по_городу
             if (row == validRow && (column == selectedChecker.Item2 - 1 || column == selectedChecker.Item2 + 1))
             {
                 view.MoveChecker(selectedChecker.Item1, selectedChecker.Item2, row, column);
-                board[row, column] = currentPlayer;
+                board[row, column] = new Checker(currentPlayer, false);
                 board[selectedChecker.Item1, selectedChecker.Item2] = null;
                 return true;
             }
@@ -305,7 +335,7 @@ namespace Шашки_по_городу
                 {
                     if (board[row, column].HasValue)
                     {
-                        view.AddCheckerToGrid(row, column, board[row, column].Value);
+                        view.AddCheckerToGrid(row, column, board[row, column].Value.player);
                     }
                 }
             }
