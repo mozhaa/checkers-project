@@ -17,7 +17,7 @@
         <Button 
             Grid.Column="1" 
             Grid.Row="0" 
-            HorizontalAlignment="Right" 
+            HorizontalAlignment="Center" 
             VerticalAlignment="Top" 
             Click="NewGameButton_Click">
             <TextBlock Text="New Game"

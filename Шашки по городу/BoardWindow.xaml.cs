@@ -31,6 +31,8 @@ namespace Шашки_по_городу
         const string highlightChainedColor = "#007FFF";
         const string checkerWhiteColor = "#FFFFFF";
         const string checkerBlackColor = "#000000";
+        const string checkerWhiteKingColor = "#FFD700";
+        const string checkerBlackKingColor = "#483D8B";
         const int gridWidth = 560;
         const int gridHeight = 560;
         const int tileWidth = gridWidth / Presenter.columns;
@@ -40,6 +42,8 @@ namespace Шашки_по_городу
         SolidColorBrush blackBrush = (SolidColorBrush)new BrushConverter().ConvertFromString(blackColor);
         SolidColorBrush checkerWhiteBrush = (SolidColorBrush)new BrushConverter().ConvertFromString(checkerWhiteColor);
         SolidColorBrush checkerBlackBrush = (SolidColorBrush)new BrushConverter().ConvertFromString(checkerBlackColor);
+        SolidColorBrush checkerWhiteKingBrush = (SolidColorBrush)new BrushConverter().ConvertFromString(checkerWhiteKingColor);
+        SolidColorBrush checkerBlackKingBrush = (SolidColorBrush)new BrushConverter().ConvertFromString(checkerBlackKingColor);
         SolidColorBrush highlightBrush = (SolidColorBrush)new BrushConverter().ConvertFromString(highlightColor);
         SolidColorBrush highlightChainedBrush = (SolidColorBrush)new BrushConverter().ConvertFromString(highlightChainedColor);
 
@@ -115,23 +119,23 @@ namespace Шашки_по_городу
             this.presenter = presenter;
         }
 
-        private SolidColorBrush getColorByPlayer(Player player)
+        private SolidColorBrush getColorByPlayer(Checker checker)
         {
-            switch (player)
+            switch (checker.Player)
             {
                 case Player.black:
-                    return checkerBlackBrush;
+                    return checker.IsKing ? checkerBlackKingBrush : checkerBlackBrush;
                 case Player.white:
-                    return checkerWhiteBrush;
+                    return checker.IsKing ? checkerWhiteKingBrush : checkerWhiteBrush;
                 default:
                     return null;
             }
         }
 
-        public void AddCheckerToGrid(int row, int column, Player player)
+        public void AddCheckerToGrid(int row, int column, Checker checker)
         {
-            var colorBrush = getColorByPlayer(player);
-            Trace.WriteLine($"create an ellipse in ({row}, {column})");
+            var colorBrush = getColorByPlayer(checker);
+            //Trace.WriteLine($"create an ellipse in ({row}, {column})");
             Ellipse ellipse = new Ellipse
             {
                 Height = tileHeight - 2 * 5,
@@ -208,6 +212,12 @@ namespace Шашки_по_городу
             rectangle.StrokeThickness = 0;
         }
 
+        public void RefreshTile(int row, int column, Checker checker)
+        {
+            RemoveCheckerFromGrid(row, column);
+            AddCheckerToGrid(row, column, checker);
+        }
+
         private void Grid_MouseDown(object sender, MouseButtonEventArgs e)
         {
             Point clickedOn = e.GetPosition(boardGrid);
@@ -215,7 +225,7 @@ namespace Шашки_по_городу
             double y = clickedOn.Y;
             int row = (int)y / tileWidth;
             int column = (int)x / tileHeight;
-            Trace.WriteLine($"clicked on ({row}, {column})");
+            Trace.WriteLine($"Clicked on ({row}, {column})");
             presenter.MouseDown(row, column);
         }
 
