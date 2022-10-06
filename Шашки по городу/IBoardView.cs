@@ -6,6 +6,7 @@ namespace Шашки_по_городу
     internal interface IBoardView
     {
         void AddCheckerToGrid(int row, int column, Player player);
+        void ClearGrid();
         void DehighlightTile(int row, int column);
         void HighlightChainedTile(int row, int column);
         void HighlightTile(int row, int column);

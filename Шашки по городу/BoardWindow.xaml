@@ -5,5 +5,24 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Шашки_по_городу"
         mc:Ignorable="d"
-        Title="Шашки по городу" Height="640px" Width="800px">
+        Title="Шашки по городу" Height="600px" Width="800px">
+    <Grid x:Name="windowGrid">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="560px"></ColumnDefinition>
+            <ColumnDefinition Width="220px" ></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Button 
+            Grid.Column="1" 
+            Grid.Row="0" 
+            HorizontalAlignment="Right" 
+            VerticalAlignment="Top" 
+            Click="NewGameButton_Click">
+            <TextBlock Text="New Game"
+                       FontSize="20"
+                       Margin="5px"></TextBlock>
+        </Button>
+    </Grid>
 </Window>

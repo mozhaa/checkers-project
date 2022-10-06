@@ -25,6 +25,12 @@ namespace Шашки_по_городу
         private readonly IBoardView view;
         private List<Tuple<int, int>> chainMove = new List<Tuple<int, int>>();
         private Player currentPlayer;
+        private Dictionary<Player, int> checkersCount = new Dictionary<Player, int>
+        {
+            [Player.white] = 0,
+            [Player.black] = 0
+        };
+        private bool isPlaying = false;
 
         public Presenter(IBoardView view)
         {
@@ -35,6 +41,8 @@ namespace Шашки_по_городу
         public void Start()
         {
             currentPlayer = Player.white;
+            isPlaying = true;
+            view.ClearGrid();
             for(int row = 0; row < rows; row++)
             {
                 for(int column = 0; column < columns; column++)
@@ -46,6 +54,7 @@ namespace Шашки_по_городу
                             if ((row + column) % 2 != 0)
                             {
                                 board[row, column] = Player.white;
+                                checkersCount[Player.white]++;
                             }
                             break;
                         case 5:
@@ -54,6 +63,7 @@ namespace Шашки_по_городу
                             if ((row + column) % 2 != 0)
                             {
                                 board[row, column] = Player.black;
+                                checkersCount[Player.black]++;
                             }
                             break;
                         default:
@@ -67,6 +77,7 @@ namespace Шашки_по_городу
 
         internal void MouseDown(int row, int column)
         {
+            if (!isPlaying) { return; }
             if(chainMove.Count > 0)
             {
                 var selectedChecker = chainMove[0];
@@ -90,6 +101,7 @@ namespace Шашки_по_городу
                         {
                             view.DehighlightTile(chainMove[i].Item1, chainMove[i].Item2);
                         }
+                        Trace.WriteLine($"chainmovecount: {chainMove.Count}");
                         chainMove.Clear();
                         currentPlayer = (currentPlayer == Player.white) ? Player.black : Player.white;
                         Trace.WriteLine($"Current Player: {currentPlayer}");
@@ -115,6 +127,10 @@ namespace Шашки_по_городу
                 {
                     Trace.WriteLine("Selected tile is empty or wrong color");
                 }
+            }
+            if (checkersCount[Player.white] == 0 || checkersCount[Player.black] == 0)
+            {
+                GameOver();
             }
         }
 
@@ -236,6 +252,8 @@ namespace Шашки_по_городу
             if(TryToChainMove(new List<Tuple<int, int>>(chainMove) { new Tuple<int, int>(row, column) }) == 0)
             {
                 Trace.WriteLine("Chain move is complete, make move");
+                checkersCount[((currentPlayer == Player.white) ? Player.black : Player.white)] -= chainMove.Count;
+                Trace.WriteLine($"Black: {checkersCount[Player.black]}, White: {checkersCount[Player.white]}");
                 return 0; // Valid move
             }
             if(TryToChainMove(new List<Tuple<int, int>>(chainMove) { new Tuple<int, int>(row, column) }) == 2)
@@ -263,6 +281,20 @@ namespace Шашки_по_городу
             }
             Trace.WriteLine("Simple move is not valid, try another tile to move");
             return false;
+        }
+
+        private void GameOver()
+        {
+            if (checkersCount[Player.white] == 0)
+            {
+                Trace.WriteLine("Black wins!");
+                isPlaying = false;
+            }
+            else
+            {
+                Trace.WriteLine("White wins!");
+                isPlaying = false;
+            }
         }
 
         private void ShowBoard()

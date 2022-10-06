@@ -99,7 +99,10 @@ namespace Шашки_по_городу
                     */
                 }
             }
-            Content = boardGrid;
+
+            Grid.SetRow(boardGrid, 0);
+            Grid.SetColumn(boardGrid, 0);
+            windowGrid.Children.Add(boardGrid);
         }
 
         private void BoardWindow_Loaded(object sender, RoutedEventArgs e)
@@ -169,6 +172,15 @@ namespace Шашки_по_городу
             }
         }
 
+        public void ClearGrid()
+        {
+            foreach(var checker in checkersList)
+            {
+                boardGrid.Children.Remove(checker);
+            }
+            checkersList.Clear();
+        }
+
         public void MoveChecker(int fromRow, int fromColumn, int toRow, int toColumn)
         {
             Ellipse checker = GetCheckerByRowAndColumn(fromRow, fromColumn);
@@ -207,5 +219,11 @@ namespace Шашки_по_городу
             presenter.MouseDown(row, column);
         }
 
+
+        private void NewGameButton_Click(object sender, RoutedEventArgs e)
+        {
+            Trace.WriteLine("Clicked on New Game");
+            presenter.Start();
+        }
     }
 }
