@@ -90,6 +90,9 @@ namespace Шашки_по_городу
         }
     }
 
+    /// <summary>
+    /// Class, that presents object of chain move. It includes functions, that check if move is valid, if move can be extended, etc
+    /// </summary>
     public struct ChainMove
     {
         public List<ChainTile> chainTiles;
@@ -113,27 +116,52 @@ namespace Шашки_по_городу
             this.board = toCopy.board;
         }
 
+        /// <summary>
+        /// This function clears current chain
+        /// </summary>
         public void Clear()
         {
             chainTiles.Clear();
         }
 
+        /// <summary>
+        /// This function checks if [row, column] is out of board or not
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="column"></param>
+        /// <returns></returns>
         private bool OutOfEdges(int row, int column)
         {
             return row < 0 || row > 7 || column < 0 || column > 7;
         }
 
+        /// <summary>
+        /// This function checks if [row, column] tile is another tile than first tile in chain, but it is not empty
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="column"></param>
+        /// <returns></returns>
         private bool AnotherTileButHasChecker(int row, int column)
         {
             var firstTile = chainTiles[0];
             return board[row, column].HasValue && (row != firstTile.Row || column != firstTile.Column);
         }
 
+        /// <summary>
+        /// This function checks, if current chain is a valid chain move (move with eating opponent checkers) or not
+        /// </summary>
+        /// <param name="currentPlayer"></param>
+        /// <returns></returns>
         public bool IsValidChainMove(Player currentPlayer)
         {
             return GetCheckersToEat(currentPlayer) != null;
         }
 
+        /// <summary>
+        /// This function checks, if current chain is a valid simple move (move without eating opponent checkers) or not
+        /// </summary>
+        /// <param name="currentPlayer"></param>
+        /// <returns></returns>
         public bool IsValidSimpleMove(Player currentPlayer)
         {
             if (chainTiles.Count != 2 || !chainTiles[chainTiles.Count - 1].IsValid() || board[chainTiles[1].Row, chainTiles[1].Column].HasValue)
@@ -164,6 +192,11 @@ namespace Шашки_по_городу
             return false;
         }
 
+        /// <summary>
+        /// This function returns HashSet of checkers, that player will eat, moving by current chain. If current chain is not a valid move, function returns null
+        /// </summary>
+        /// <param name="currentPlayer"></param>
+        /// <returns></returns>
         public HashSet<ChainTile> GetCheckersToEat(Player currentPlayer)
         {
             var row = chainTiles[chainTiles.Count - 1].Row;
@@ -253,6 +286,13 @@ namespace Шашки_по_городу
             return checkersToEat; // Valid move
         }
 
+        /// <summary>
+        /// This function checks, can we extend current chain with move to [row, column] tile
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="column"></param>
+        /// <param name="currentPlayer"></param>
+        /// <returns></returns>
         public int TryAddMove(int row, int column, Player currentPlayer)
         {
             var expectedChain = new ChainMove(this, new ChainTile(row, column));
@@ -285,6 +325,11 @@ namespace Шашки_по_городу
             return 0; // Move is complete
         }
 
+        /// <summary>
+        /// This function check, can current chain move be continued or not
+        /// </summary>
+        /// <param name="currentPlayer"></param>
+        /// <returns></returns>
         public bool DoesMoveExist(Player currentPlayer)
         {
             var lastTile = chainTiles[chainTiles.Count - 1];
@@ -316,18 +361,18 @@ namespace Шашки_по_городу
     internal class Presenter
     {
 
-        public const int rows = 8;
-        public const int columns = 8;
-        private readonly Checker?[,] board = new Checker?[rows, columns];
-        private readonly IBoardView view;
-        private ChainMove currentChain;
-        private Player currentPlayer;
-        private Dictionary<Player, int> checkersCount = new Dictionary<Player, int>
+        public const int rows = 8; // Number of rows
+        public const int columns = 8; // Number of columns
+        private readonly Checker?[,] board = new Checker?[rows, columns]; // Array of checkers, that are currently on the board
+        private readonly IBoardView view; // IBoardView object, that connects current presenter with window
+        private ChainMove currentChain; // List of tiles, that current player selected on the board
+        private Player currentPlayer; // Current player (black or white) 
+        private Dictionary<Player, int> checkersCount = new Dictionary<Player, int> // Dictionary, that stores number of checkers of particular color
         {
             [Player.white] = 0,
             [Player.black] = 0
         };
-        private bool isPlaying = false;
+        private bool isPlaying = false; 
 
         public Presenter(IBoardView view)
         {
@@ -335,7 +380,9 @@ namespace Шашки_по_городу
             this.view = view;
             this.view.SetPresenter(this);
         }
-
+        /// <summary>
+        /// This function is called, when the window is opening, or user clicks button "New Game"
+        /// </summary>
         public void Start()
         {
             currentPlayer = Player.white;
@@ -372,7 +419,10 @@ namespace Шашки_по_городу
             }
             ShowBoard();
         }
-
+        /// <summary>
+        /// This function checks, if current player can make a move
+        /// </summary>
+        /// <returns></returns>
         internal bool CanCurrentPlayerMove()
         {
             for (int row = 0; row < 8; row++)
@@ -390,7 +440,11 @@ namespace Шашки_по_городу
             }
             return false;
         }
-
+        /// <summary>
+        /// This function is called, when user clicks the window's Grid. It process click and make move if it's valid
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="column"></param>
         internal void MouseDown(int row, int column)
         {
             if (!isPlaying) { return; }
@@ -499,7 +553,9 @@ namespace Шашки_по_городу
                 GameOver();
             }
         }
-
+        /// <summary>
+        /// This function is called, if the game ends (all checkers of one color have been eaten, or one player can't move)
+        /// </summary>
         private void GameOver()
         {
             if (checkersCount[Player.white] == 0)
@@ -514,6 +570,9 @@ namespace Шашки_по_городу
             }
         }
 
+        /// <summary>
+        /// This function draw the board on the empty window's grid, using board list
+        /// </summary>
         private void ShowBoard()
         {
             for(int row = 0; row < rows; row++)
